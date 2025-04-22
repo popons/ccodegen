@@ -89,4 +89,4 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 
 ## License
 
-This project is licensed under the [Your License Here] license. (TODO: Add license info)
+This project is licensed under the MIT license.

@@ -2,6 +2,7 @@
 name = "ccodegen"
 version = "0.9.0"
 edition = "2021"
+license = "MIT"
 
 [lib]
 path = "src/lib.rs"
