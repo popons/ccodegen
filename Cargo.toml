@@ -1,0 +1,16 @@
+[package]
+name = "ccodegen"
+version = "0.9.0"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+# Explicitly defining the library target
+
+[dependencies]
+anyhow = "1.0"
+regex = "1"
+
+# このクレート内で必要になる可能性のある他の依存関係をここに追加できます
+# 例: thiserror = "1.0" (エラー処理用)
+thiserror = "1.0" # codegen::error で使われているため追加
