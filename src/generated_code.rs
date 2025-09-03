@@ -59,7 +59,7 @@ impl GeneratedCodeManager {
         (content.find(&begin_marker), content.rfind(&end_marker))
       {
         // Section exists, replace content between markers
-        let begin_marker_end = begin_pos + begin_marker.len();
+        let _begin_marker_end = begin_pos + begin_marker.len();
         let replacement = format!("{}\n{}", begin_marker, code);
         content.replace_range(begin_pos..end_pos, &replacement);
       } else {

@@ -165,4 +165,151 @@ int main() {
 "#;
     assert_eq!(generated, expected);
   }
+
+  #[test]
+  fn test_partial_section_capture() {
+    let content = r#"
+// Some initial content
+//!begin 1
+// This is partial section 1
+int counter = 0;
+//!end 1
+
+// More content
+//!begin 2
+void custom_function() {
+    // User code here
+}
+//!end 2
+"#;
+
+    let mut manager = UserSectionManager::new();
+    let result = manager.capture_from_string(content, std::path::Path::new("test.c"));
+    assert!(result.is_ok());
+
+    assert!(manager.has_partial_section(1));
+    assert!(manager.has_partial_section(2));
+    assert!(!manager.has_partial_section(3));
+
+    let section1 = manager.get_partial_section_content(1).unwrap();
+    assert!(section1.contains("int counter = 0;"));
+
+    let section2 = manager.get_partial_section_content(2).unwrap();
+    assert!(section2.contains("void custom_function()"));
+  }
+
+  #[test]
+  fn test_partial_section_write() {
+    let mut buffer = Cursor::new(Vec::new());
+    let mut writer = CodeWriter::new(&mut buffer);
+    let manager = UserSectionManager::new();
+
+    // Write partial section with default content
+    let result = manager.write_partial_section(&mut writer, 1, Some("// Default content"));
+    assert!(result.is_ok());
+
+    let output = String::from_utf8(buffer.into_inner()).unwrap();
+    assert!(output.contains("//!begin 1"));
+    assert!(output.contains("// Default content"));
+    assert!(output.contains("//!end 1"));
+  }
+
+  #[test]
+  fn test_partial_section_preserve() {
+    // First, capture existing content
+    let existing_content = r#"
+//!begin 1
+// User's custom code
+int user_variable = 42;
+//!end 1
+"#;
+
+    let mut manager = UserSectionManager::new();
+    manager.capture_from_string(existing_content, std::path::Path::new("test.c")).unwrap();
+
+    // Write it back
+    let mut buffer = Cursor::new(Vec::new());
+    let mut writer = CodeWriter::new(&mut buffer);
+    manager.write_partial_section(&mut writer, 1, Some("// Default")).unwrap();
+
+    let output = String::from_utf8(buffer.into_inner()).unwrap();
+    assert!(output.contains("int user_variable = 42;"));
+    assert!(!output.contains("// Default"));
+  }
+
+  #[test]
+  fn test_mixed_section_types() {
+    let content = r#"
+/* USER CODE BEGIN Header */
+// File header
+/* USER CODE END Header */
+
+//!begin 1
+// Partial section 1
+//!end 1
+
+/* USER CODE BEGIN Includes */
+#include <stdio.h>
+/* USER CODE END Includes */
+
+//!begin 2
+// Partial section 2
+//!end 2
+"#;
+
+    let mut manager = UserSectionManager::new();
+    manager.define_section("Header");
+    manager.define_section("Includes");
+
+    let result = manager.capture_from_string(content, std::path::Path::new("test.c"));
+    assert!(result.is_ok());
+
+    // Check USER CODE sections
+    assert_eq!(manager.get_section_content("Header").unwrap().trim(), "// File header");
+    assert_eq!(manager.get_section_content("Includes").unwrap().trim(), "#include <stdio.h>");
+
+    // Check partial sections
+    assert!(manager.get_partial_section_content(1).unwrap().contains("// Partial section 1"));
+    assert!(manager.get_partial_section_content(2).unwrap().contains("// Partial section 2"));
+  }
+
+  #[test]
+  fn test_nested_section_error() {
+    let content = r#"
+//!begin 1
+//!begin 2
+// Nested - should fail
+//!end 2
+//!end 1
+"#;
+
+    let mut manager = UserSectionManager::new();
+    let result = manager.capture_from_string(content, std::path::Path::new("test.c"));
+    assert!(result.is_err());
+  }
+
+  #[test]
+  fn test_mismatched_section_error() {
+    let content = r#"
+//!begin 1
+// Content
+//!end 2
+"#;
+
+    let mut manager = UserSectionManager::new();
+    let result = manager.capture_from_string(content, std::path::Path::new("test.c"));
+    assert!(result.is_err());
+  }
+
+  #[test]
+  fn test_unclosed_section_error() {
+    let content = r#"
+//!begin 1
+// Content without end
+"#;
+
+    let mut manager = UserSectionManager::new();
+    let result = manager.capture_from_string(content, std::path::Path::new("test.c"));
+    assert!(result.is_err());
+  }
 }

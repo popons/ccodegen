@@ -1,16 +1,19 @@
 use std::path::Path;
 
 /// Check if a file exists
+#[allow(dead_code)]
 pub fn file_exists(path: &Path) -> bool {
     path.exists() && path.is_file()
 }
 
 /// Get the file name from a path
+#[allow(dead_code)]
 pub fn get_file_name(path: &Path) -> Option<String> {
     path.file_name().and_then(|name| name.to_str()).map(String::from)
 }
 
 /// Join strings with a separator
+#[allow(dead_code)]
 pub fn join_strings<S: AsRef<str>>(strings: &[S], separator: &str) -> String {
     strings
         .iter()
@@ -25,6 +28,7 @@ pub fn repeat_str(s: &str, n: usize) -> String {
 }
 
 /// Convert a string to a valid identifier
+#[allow(dead_code)]
 pub fn to_valid_identifier(s: &str) -> String {
     let mut result = String::new();
     let mut chars = s.chars();
@@ -51,6 +55,7 @@ pub fn to_valid_identifier(s: &str) -> String {
 }
 
 /// Ensure a string ends with a newline
+#[allow(dead_code)]
 pub fn ensure_ends_with_newline(s: &str) -> String {
     if s.ends_with('\n') {
         s.to_string()
