@@ -108,7 +108,7 @@ impl<W: Write> CodeWriter<W> {
         }
       }
 
-      if self.with_newline && !content.ends_with('\n') {
+      if self.with_newline {
         self
           .writer
           .write_all(b"\n")

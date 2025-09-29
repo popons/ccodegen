@@ -376,7 +376,6 @@ impl UserSectionManager {
 
     // Write section end marker
     writer.writeln(&format!("/* USER CODE END {} */", name))?;
-    writer.newline()?;
 
     Ok(())
   }
@@ -405,7 +404,6 @@ impl UserSectionManager {
 
     // Write section end marker
     writer.writeln(&format!("/* USER CODE END {} */", name))?;
-    writer.newline()?;
 
     Ok(())
   }
