@@ -150,8 +150,23 @@ impl<W: Write> CodeWriter<W> {
   }
 
   /// Write a separator comment
-  pub fn write_separator(&mut self, title: &str, _width: usize) -> Result<()> {
-    self.writeln(&format!("/* {} */", title))
+  pub fn write_separator(&mut self, title: &str, width: usize) -> Result<()> {
+    let prefix = "/* ";
+    let suffix = " */";
+
+    let mut line = String::with_capacity(width.max(prefix.len() + title.len() + suffix.len()));
+    line.push_str(prefix);
+    line.push_str(title);
+
+    if width > line.len() + suffix.len() {
+      line.push(' ');
+      while width > line.len() + suffix.len() {
+        line.push('-');
+      }
+    }
+
+    line.push_str(suffix);
+    self.writeln(&line)
   }
 
   /// Begin a struct definition
