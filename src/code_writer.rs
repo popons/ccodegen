@@ -158,9 +158,10 @@ impl<W: Write> CodeWriter<W> {
     line.push_str(prefix);
     line.push_str(title);
 
-    if width > line.len() + suffix.len() {
+    if width >= line.len() + suffix.len() {
+      // Match legacy generator output where total length becomes `width + 1`.
       line.push(' ');
-      while width > line.len() + suffix.len() {
+      while width >= line.len() + suffix.len() {
         line.push('-');
       }
     }
