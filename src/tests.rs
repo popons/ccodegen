@@ -225,12 +225,16 @@ int user_variable = 42;
 "#;
 
     let mut manager = UserSectionManager::new();
-    manager.capture_from_string(existing_content, std::path::Path::new("test.c")).unwrap();
+    manager
+      .capture_from_string(existing_content, std::path::Path::new("test.c"))
+      .unwrap();
 
     // Write it back
     let mut buffer = Cursor::new(Vec::new());
     let mut writer = CodeWriter::new(&mut buffer);
-    manager.write_partial_section(&mut writer, 1, Some("// Default")).unwrap();
+    manager
+      .write_partial_section(&mut writer, 1, Some("// Default"))
+      .unwrap();
 
     let output = String::from_utf8(buffer.into_inner()).unwrap();
     assert!(output.contains("int user_variable = 42;"));
@@ -265,12 +269,24 @@ int user_variable = 42;
     assert!(result.is_ok());
 
     // Check USER CODE sections
-    assert_eq!(manager.get_section_content("Header").unwrap().trim(), "// File header");
-    assert_eq!(manager.get_section_content("Includes").unwrap().trim(), "#include <stdio.h>");
+    assert_eq!(
+      manager.get_section_content("Header").unwrap().trim(),
+      "// File header"
+    );
+    assert_eq!(
+      manager.get_section_content("Includes").unwrap().trim(),
+      "#include <stdio.h>"
+    );
 
     // Check partial sections
-    assert!(manager.get_partial_section_content(1).unwrap().contains("// Partial section 1"));
-    assert!(manager.get_partial_section_content(2).unwrap().contains("// Partial section 2"));
+    assert!(manager
+      .get_partial_section_content(1)
+      .unwrap()
+      .contains("// Partial section 1"));
+    assert!(manager
+      .get_partial_section_content(2)
+      .unwrap()
+      .contains("// Partial section 2"));
   }
 
   #[test]

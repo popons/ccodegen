@@ -222,12 +222,10 @@ impl UserSectionManager {
     let begin_pattern =
       Regex::new(r"/\* USER CODE BEGIN ([\w]+) \*/").map_err(CodeGenError::Regex)?;
     let end_pattern = Regex::new(r"/\* USER CODE END ([\w]+) \*/").map_err(CodeGenError::Regex)?;
-    
+
     // Patterns for partial update sections
-    let partial_begin_pattern = 
-      Regex::new(r"//!begin\s+(\d+)").map_err(CodeGenError::Regex)?;
-    let partial_end_pattern = 
-      Regex::new(r"//!end\s+(\d+)").map_err(CodeGenError::Regex)?;
+    let partial_begin_pattern = Regex::new(r"//!begin\s+(\d+)").map_err(CodeGenError::Regex)?;
+    let partial_end_pattern = Regex::new(r"//!end\s+(\d+)").map_err(CodeGenError::Regex)?;
 
     let mut current_section: Option<String> = None;
     let mut current_partial: Option<u32> = None;
@@ -257,7 +255,8 @@ impl UserSectionManager {
         if current_section.is_some() || current_partial.is_some() {
           return Err(CodeGenError::NestedSection {
             line: line_number,
-            section: current_section.unwrap_or_else(|| format!("partial {}", current_partial.unwrap())),
+            section: current_section
+              .unwrap_or_else(|| format!("partial {}", current_partial.unwrap())),
           });
         }
 
@@ -332,7 +331,10 @@ impl UserSectionManager {
     }
 
     if let Some(partial_num) = current_partial {
-      return Err(CodeGenError::UnclosedSection(format!("partial section {}", partial_num)));
+      return Err(CodeGenError::UnclosedSection(format!(
+        "partial section {}",
+        partial_num
+      )));
     }
 
     Ok(())
@@ -497,7 +499,9 @@ impl UserSectionManager {
       total_sections: self.sections.len(),
       captured_sections: self.captured_content.len(),
       partial_sections: self.partial_sections.len(),
-      sections_with_default: self.sections.values()
+      sections_with_default: self
+        .sections
+        .values()
         .filter(|s| s.default_content.is_some())
         .count(),
     }
@@ -508,7 +512,8 @@ impl UserSectionManager {
     for captured_name in self.captured_content.keys() {
       if !self.sections.contains_key(captured_name) {
         return Err(CodeGenError::UnknownSection(format!(
-          "Captured section '{}' has no definition", captured_name
+          "Captured section '{}' has no definition",
+          captured_name
         )));
       }
     }
