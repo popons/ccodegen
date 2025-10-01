@@ -15,3 +15,6 @@ regex = "1"
 # このクレート内で必要になる可能性のある他の依存関係をここに追加できます
 # 例: thiserror = "1.0" (エラー処理用)
 thiserror = "1.0" # codegen::error で使われているため追加
+
+[dev-dependencies]
+tempfile = "3"
